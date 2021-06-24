@@ -19,21 +19,34 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+import cpu_sizes::*;
 
 module ProgCount(
     input PC_CLK,
     input PC_RST,
     input PC_LD,
-    input logic [31:0] PC_DIN,
-    output logic [31:0] PC_COUNT=0
+    input logic [31:0] PC_IN,
+    output logic [31:0][INSTR_WINDOW-1:0] PC_OUT=0
     );
     
+    integer i = 0;
     always_ff @(posedge PC_CLK)
     begin
         if (PC_RST == 1'b1)
-            PC_COUNT <= '0;
+            begin
+                begin
+                for (i=0; i<INSTR_WINDOW;i++)
+                begin
+                    PC_OUT[i] <= 0+(4*i); // reset to initial instruction window
+                end
+            end
         else if (PC_LD == 1'b1)
-            PC_COUNT <= PC_DIN;
+            begin
+                for (i=0; i<INSTR_WINDOW;i++)
+                begin
+                    PC_OUT[i] <= PC_IN+(4*i); // set all necessary PC values
+                end
+            end
     end
     
 endmodule
